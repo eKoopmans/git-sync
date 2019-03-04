@@ -39,6 +39,7 @@ for project in gitDirs:
   try:
     localRepo = Repo(localDir)
   except:
+    print('Not a repo.')
     continue
 
   # Setup the bare directory if necessary.
@@ -48,6 +49,7 @@ for project in gitDirs:
     # assert bare_repo.bare
 
   # Push to bare remote.
+  print('Pushing local to bare.')
   try:
     localDest = localRepo.remote(location)
   except:
@@ -68,6 +70,7 @@ for project in gitDirs:
     remoteRepo = Repo.init(remoteDir)
 
   # Pull remote from bare.
+  print('Pulling remote from bare.')
   try:
     remoteSrc = remoteRepo.remote(location)
   except:
