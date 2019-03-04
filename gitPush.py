@@ -31,14 +31,14 @@ gitDirs = next(os.walk(local))[1]
 # Loop through all dirs.
 for project in gitDirs:
   # Progress update.
-  print(project + ':')
+  print(project + ':', flush=True)
 
   # Check if it is a git project.
   localDir = os.path.join(local, project)
   try:
     localRepo = Repo(localDir)
   except:
-    print('Not a repo.')
+    print('Not a repo.', flush=True)
     continue
 
   # Setup the bare directory if necessary.
@@ -48,7 +48,7 @@ for project in gitDirs:
     # assert bare_repo.bare
 
   # Push to bare remote.
-  print('Pushing local to bare.')
+  print('Pushing local to bare.', flush=True)
   try:
     localDest = localRepo.remote(location)
   except:
@@ -69,7 +69,7 @@ for project in gitDirs:
     remoteRepo = Repo.init(remoteDir)
 
   # Pull remote from bare.
-  print('Pulling remote from bare.')
+  print('Pulling remote from bare.', flush=True)
   try:
     remoteSrc = remoteRepo.remote(location)
   except:
@@ -77,13 +77,13 @@ for project in gitDirs:
   remoteSrc.pull('master')
 
   # Progress update.
-  print(project + ' done!')
+  print(project + ' done!', flush=True)
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
 localDevel = os.path.join(localDir, '.devel')
 if os.path.isdir(localDevel):
   # Setup paths.
-  print('Syncing all .devel folders.')
+  print('Syncing all .devel folders.', flush=True)
   ffsDevel = os.path.join(bare[location], 'gitDevel.ffs_batch')
 
   # Create the FFS sync file if it doesn't exist.
@@ -95,3 +95,6 @@ if os.path.isdir(localDevel):
 
   # Run the sync.
   subprocess.call([ffs, ffsDevel])
+
+# Progress update.
+print('All done!', flush=True)
