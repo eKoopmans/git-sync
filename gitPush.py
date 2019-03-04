@@ -1,5 +1,4 @@
 ### TODO:
-# - copy ".devel" over
 # - location: command line argument
 # - add ability for work to push (and pull) to bare
 # - create a pull script
@@ -76,6 +75,24 @@ for project in gitDirs:
   except:
     remoteSrc = remoteRepo.create_remote(location, bareDir)
   remoteSrc.pull('master')
+
+  # Synchronise .devel folder with FreeFileSync (FFS).
+  localDevel = os.path.join(localDir, '.devel')
+  if os.path.isdir(localDevel):
+    # Setup paths.
+    print('Syncing .devel.')
+    remoteDevel = os.path.join(remoteDir, '.devel')
+    ffsDevel = os.path.join(bare[location], project + '.ffs_batch')
+
+    # Create the FFS sync file if it doesn't exist.
+    if not os.path.exists(ffsDevel):
+      shutil.copy2('./template.ffs_batch', ffsDevel)
+      with fileinput.FileInput(ffsDevel, inplace=True) as file:
+        for line in file:
+          print(line.replace('%LOCAL%', localDevel).replace('%REMOTE%', remoteDevel), end='')
+
+    # Run the sync.
+    subprocess.call([ffs, ffsDevel])
 
   # Progress update.
   print(project + ' done!')
