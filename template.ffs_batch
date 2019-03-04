@@ -13,7 +13,7 @@
     </Synchronize>
     <Filter>
         <Include>
-            <Item>*</Item>
+            <Item>*\.devel\</Item>
         </Include>
         <Exclude>
             <Item>\System Volume Information\</Item>
@@ -23,6 +23,7 @@
             <Item>*\desktop.ini</Item>
             <Item>*\thumbs.db</Item>
             <Item>*.lnk</Item>
+            <Item>*\.git\</Item>
         </Exclude>
         <TimeSpan Type="None">0</TimeSpan>
         <SizeMin Unit="None">0</SizeMin>
