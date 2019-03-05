@@ -15,10 +15,6 @@ location = 'work'
 
 # Setup variables.
 local = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST"
-bare = {
-  'work': r"Z:\Northcote High School\8. Git\.bare",
-  'home': r"C:\Users\eko\Desktop\VIRTUAL\home\.bare"
-}
 remote = {
   'work': r"Z:\Northcote High School\8. Git",
   'home': r"C:\Users\eko\Desktop\VIRTUAL\home"
@@ -41,20 +37,6 @@ for project in gitDirs:
     print('Not a repo.', flush=True)
     continue
 
-  # Setup the bare directory if necessary.
-  bareDir = os.path.join(bare[location], project + '.git')
-  if not os.path.isdir(bareDir):
-    bare_repo = Repo.init(bareDir, bare=True)
-    # assert bare_repo.bare
-
-  # Push to bare remote.
-  print('Pushing local to bare.', flush=True)
-  try:
-    localDest = localRepo.remote(location).set_url(bareDir)
-  except:
-    localDest = localRepo.create_remote(location, bareDir)
-  localDest.push()
-
   # Setup the remote directory if necessary.
   remoteDir = os.path.join(remote[location], project)
   try:
@@ -68,13 +50,19 @@ for project in gitDirs:
   except:
     remoteRepo = Repo.init(remoteDir)
 
-  # Pull remote from bare.
-  print('Pulling remote from bare.', flush=True)
+  # Enable pushing directly to remote.
+  with remoteRepo.config_writer() as cw:
+    cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
+
+  # Setup local repo to point to remote.
   try:
-    remoteSrc = remoteRepo.remote(location).set_url(bareDir)
+    localDest = localRepo.remote(location).set_url(remoteDir)
   except:
-    remoteSrc = remoteRepo.create_remote(location, bareDir)
-  remoteSrc.pull('master')
+    localDest = localRepo.create_remote(location, remoteDir)
+
+  # Push to remote.
+  print('Pushing local to remote.', flush=True)
+  localDest.push()
 
   # Progress update.
   print(project + ' done!\n', flush=True)
