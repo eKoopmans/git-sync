@@ -62,7 +62,8 @@ for project in gitDirs:
 
   # Push to remote.
   print('Pushing local to remote.', flush=True)
-  localDest.push()
+  info = localDest.push()[0]
+  print(info.summary.strip('\r\n'))
 
   # Progress update.
   print(project + ' done!\n', flush=True)
