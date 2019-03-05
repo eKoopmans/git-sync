@@ -16,12 +16,12 @@ location = 'work'
 # Setup variables.
 local = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST"
 bare = {
-  'work': r"Z:\git-bare",
-  'home': r"C:\Users\eko\Desktop\VIRTUAL\bare-home"
+  'work': r"Z:\Northcote High School\8. Git\.bare",
+  'home': r"C:\Users\eko\Desktop\VIRTUAL\home\.bare"
 }
 remote = {
   'work': r"Z:\Northcote High School\8. Git",
-  'home': r"C:\Users\eko\Desktop\VIRTUAL\remote-home"
+  'home': r"C:\Users\eko\Desktop\VIRTUAL\home"
 }
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
 
@@ -50,7 +50,7 @@ for project in gitDirs:
   # Push to bare remote.
   print('Pushing local to bare.', flush=True)
   try:
-    localDest = localRepo.remote(location)
+    localDest = localRepo.remote(location).set_url(bareDir)
   except:
     localDest = localRepo.create_remote(location, bareDir)
   localDest.push()
@@ -71,7 +71,7 @@ for project in gitDirs:
   # Pull remote from bare.
   print('Pulling remote from bare.', flush=True)
   try:
-    remoteSrc = remoteRepo.remote(location)
+    remoteSrc = remoteRepo.remote(location).set_url(bareDir)
   except:
     remoteSrc = remoteRepo.create_remote(location, bareDir)
   remoteSrc.pull('master')
@@ -84,7 +84,7 @@ localDevel = os.path.join(localDir, '.devel')
 if os.path.isdir(localDevel):
   # Setup paths.
   print('Syncing all .devel folders.', flush=True)
-  ffsDevel = os.path.join(bare[location], 'gitDevel.ffs_batch')
+  ffsDevel = os.path.join(remote[location], 'gitDevel.ffs_batch')
 
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
