@@ -77,7 +77,7 @@ for project in gitDirs:
   remoteSrc.pull('master')
 
   # Progress update.
-  print(project + ' done!', flush=True)
+  print(project + ' done!\n', flush=True)
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
 localDevel = os.path.join(localDir, '.devel')
