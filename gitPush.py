@@ -11,6 +11,7 @@ from git import Repo
 
 # TODO: Make this a command-line argument.
 location = 'work'
+dryrun = False
 
 # Setup variables.
 local = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST"
@@ -61,7 +62,10 @@ for project in gitDirs:
 
   # Push to remote.
   print('Pushing local to remote.', flush=True)
-  infoList = localDest.push(['--all', '--follow-tags'])
+  if dryrun:
+    infoList = localDest.push(['--all', '--follow-tags', '--dry-run'])
+  else:
+    infoList = localDest.push(['--all', '--follow-tags'])
   for info in infoList:
     print('\t{:10}:\t{}'.format(str(info.local_ref), info.summary.strip('\r\n')))
 
@@ -70,7 +74,7 @@ for project in gitDirs:
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
 localDevel = os.path.join(localDir, '.devel')
-if os.path.isdir(localDevel):
+if not dryrun and os.path.isdir(localDevel):
   # Setup paths.
   print('Syncing all .devel folders.', flush=True)
   ffsDevel = os.path.join(remote[location], 'gitDevel.ffs_batch')
