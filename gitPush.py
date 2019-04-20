@@ -1,6 +1,5 @@
 ### TODO:
 # - location: command line argument
-# - add ability for work to push (and pull) to bare
 # - create a pull script
 
 # Imports.
@@ -62,8 +61,9 @@ for project in gitDirs:
 
   # Push to remote.
   print('Pushing local to remote.', flush=True)
-  info = localDest.push()[0]
-  print(info.summary.strip('\r\n'))
+  infoList = localDest.push(['--all', '--follow-tags'])
+  for info in infoList:
+    print('\t{:10}:\t{}'.format(str(info.local_ref), info.summary.strip('\r\n')))
 
   # Progress update.
   print(project + ' done!\n', flush=True)
