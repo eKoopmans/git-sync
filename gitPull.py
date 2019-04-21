@@ -1,3 +1,9 @@
+### INSTRUCTIONS:
+# 1. Copy this to ~/bin
+# 2. Add ~/bin to PATH
+# 3. Run from your desired Git folder:
+#   python gitPull.py
+
 ### TODO:
 # - change behaviour to scan remote, not local, for projects
 #   - and clone projects that don't exist locally
