@@ -13,22 +13,25 @@ import fileinput
 import subprocess
 from git import Repo
 from argparse import ArgumentParser
-from glob import glob
 
-# TODO: Make this a command-line argument.
+# Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
-parser.add_argument('projects', metavar='PROJECT', nargs='+',
-                    help='The paths to each project to run')
-parser.add_argument('-l', '--location', dest='location', metavar='LOCATION',
+parser.add_argument('local', metavar='LOCAL', nargs='?', default='.',
+                    help='The local root of the projects (default: current dir)')
+parser.add_argument('projects', metavar='PROJECT', nargs='*',
+                    help='The names of each project to run (default: * in local)')
+parser.add_argument('-l', '--location', dest='location', metavar='LOCATION', default='work',
                     help='Remote location (work or home)')
 parser.add_argument('-d', '--dry-run', dest='dryrun',
                     action='store_true', default=False,
                     help='Perform a dry-run')
 
+# Parse arguments.
 args = parser.parse_args()
 location = args.location
 dryrun = args.dryrun
-projects = [j for i in [glob(project) for project in args.projects] for j in i]
+local = args.local
+projects = args.projects or next(os.walk(local))[1]
 print(projects)
 asdf
 
