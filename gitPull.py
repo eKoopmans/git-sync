@@ -6,6 +6,7 @@
 #   gitPull [ARGUMENTS]
 
 ### TODO:
+# - for "dirty" repos, use git stash, ..., git stash pop
 # - change behaviour to scan remote, not local, for projects
 #   - and clone projects that don't exist locally
 # - THIS AND GITPUSH:
