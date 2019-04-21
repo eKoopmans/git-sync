@@ -110,14 +110,17 @@ for project in projects:
 
   # Fetch from remote.
   print('- Fetching local from remote.', flush=True)
-  if dryrun:
-    infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok', '--dry-run'])
-  else:
-    infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok'])
-  for info in infoList:
-    summary = [fetchFlags[i] for i in range(0,len(fetchFlags)) if info.flags & 2**i]
-    summary = ' '.join(summary)
-    print('\t{:10}:\t{}'.format(str(info.ref), summary))
+  try:
+    if dryrun:
+      infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok', '--dry-run'])
+    else:
+      infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok'])
+    for info in infoList:
+      summary = [fetchFlags[i] for i in range(0,len(fetchFlags)) if info.flags & 2**i]
+      summary = ' '.join(summary)
+      print('\t{:10}:\t{}'.format(str(info.ref), summary))
+  except:
+    print('\tError fetching (local may have unpushed commits).')
 
   # Reset current branch (necessary if current branch was fetched to).
   print('- Hard resetting {}.'.format(localRepo.head.ref))
