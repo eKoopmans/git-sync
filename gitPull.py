@@ -1,5 +1,4 @@
 ### TODO:
-# - get this working!
 # - change behaviour to scan remote, not local, for projects
 #   - and clone projects that don't exist locally
 # - THIS AND GITPUSH:
@@ -13,10 +12,25 @@ import shutil
 import fileinput
 import subprocess
 from git import Repo
+from argparse import ArgumentParser
+from glob import glob
 
 # TODO: Make this a command-line argument.
-location = 'work'
-dryrun = False
+parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
+parser.add_argument('projects', metavar='PROJECT', nargs='+',
+                    help='The paths to each project to run')
+parser.add_argument('-l', '--location', dest='location', metavar='LOCATION',
+                    help='Remote location (work or home)')
+parser.add_argument('-d', '--dry-run', dest='dryrun',
+                    action='store_true', default=False,
+                    help='Perform a dry-run')
+
+args = parser.parse_args()
+location = args.location
+dryrun = args.dryrun
+projects = [j for i in [glob(project) for project in args.projects] for j in i]
+print(projects)
+asdf
 
 # Setup variables.
 local = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST"
