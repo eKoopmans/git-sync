@@ -38,11 +38,8 @@ location = args.location
 dryrun = args.dryrun
 local = args.local
 projects = args.projects or next(os.walk(local))[1]
-print(projects)
-asdf
 
 # Setup variables.
-local = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST"
 remote = {
   #'work': r"Z:\Northcote High School\8. Git",
   'work': r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST-REMOTE",
@@ -62,11 +59,8 @@ fetchFlags = [
   '[error]'
 ]
 
-# Get all dirs in local.
-gitDirs = next(os.walk(local))[1]
-
 # Loop through all dirs.
-for project in gitDirs:
+for project in projects:
   # Progress update.
   print(project + ':', flush=True)
 
