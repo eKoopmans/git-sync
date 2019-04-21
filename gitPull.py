@@ -68,10 +68,6 @@ for project in gitDirs:
   except:
     remoteRepo = Repo.init(remoteDir)
 
-  # Enable pushing directly to remote.
-  with remoteRepo.config_writer() as cw:
-    cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
-
   # Setup local repo to point to remote.
   try:
     localDest = localRepo.remote(location).set_url(remoteDir)
