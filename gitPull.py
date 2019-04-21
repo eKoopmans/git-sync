@@ -69,7 +69,7 @@ for project in projects:
   try:
     localRepo = Repo(localDir)
   except:
-    print('Not a repo.', flush=True)
+    print('- Not a repo.\n', flush=True)
     continue
 
   # Setup the remote directory if necessary.
@@ -92,7 +92,7 @@ for project in projects:
     localDest = localRepo.create_remote(location, remoteDir)
 
   # Setup tracking branches.
-  print('Setting up local branches.', flush=True)
+  print('- Setting up local branches.', flush=True)
   for branch in remoteRepo.branches:
     branchStr = str(branch)
     try:
@@ -103,11 +103,11 @@ for project in projects:
 
   # Check if repo is dirty (uncommitted/untracked files).
   if localRepo.is_dirty(untracked_files=True):
-    print('Local repo dirty - skipping.\n', flush=True)
+    print('- Local repo dirty - skipping.\n', flush=True)
     continue
 
   # Fetch from remote.
-  print('Fetching local from remote.', flush=True)
+  print('- Fetching local from remote.', flush=True)
   if dryrun:
     infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok', '--dry-run'])
   else:
@@ -118,12 +118,12 @@ for project in projects:
     print('\t{:10}:\t{}'.format(str(info.ref), summary))
 
   # Reset current branch (necessary if current branch was fetched to).
-  print('Hard resetting {}.'.format(localRepo.head.ref))
+  print('- Hard resetting {}.'.format(localRepo.head.ref))
   if not dryrun:
     localRepo.head.reset('--hard')
 
   # Progress update.
-  print(project + ' done!\n', flush=True)
+  print('- {} done!\n'.format(project), flush=True)
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
 localDevel = os.path.join(localDir, '.devel')
