@@ -1,8 +1,9 @@
 ### INSTRUCTIONS:
-# 1. Copy this to ~/bin
-# 2. Add ~/bin to PATH
+# 1. Add ~/bin to PATH
+#   (~ is %USERPROFILE% in Windows)
+# 2. Copy this and gitPull.cmd to ~/bin
 # 3. Run from your desired Git folder:
-#   python gitPull.py
+#   gitPull [ARGUMENTS]
 
 ### TODO:
 # - change behaviour to scan remote, not local, for projects
