@@ -6,7 +6,7 @@
 #   gitPull [ARGUMENTS]
 
 ### TODO:
-# - for "dirty" repos, use git stash, ..., git stash pop
+# - check if there's any updates to active branch before stashing/unstashing
 # - THIS AND GITPUSH:
 #   - add a way to NOT overwrite the remote location (on this and gitPush)
 #   - specify individual projects to push/pull (instead of all)
