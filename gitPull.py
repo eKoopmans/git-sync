@@ -7,8 +7,6 @@
 
 ### TODO:
 # - for "dirty" repos, use git stash, ..., git stash pop
-# - change behaviour to scan remote, not local, for projects
-#   - and clone projects that don't exist locally
 # - THIS AND GITPUSH:
 #   - add a way to NOT overwrite the remote location (on this and gitPush)
 #   - specify individual projects to push/pull (instead of all)
@@ -66,26 +64,26 @@ for project in projects:
   # Progress update.
   print(project + ':', flush=True)
 
-  # Check if it is a git project.
-  localDir = os.path.join(local, project)
+  # Check if the remote is a git project.
+  remoteDir = os.path.join(remote[location], project)
   try:
-    localRepo = Repo(localDir)
+    remoteRepo = Repo(remoteDir)
   except:
     print('- Not a repo.\n', flush=True)
     continue
 
-  # Setup the remote directory if necessary.
-  remoteDir = os.path.join(remote[location], project)
+  # Setup the local dir if necessary.
+  localDir = os.path.join(local, project)
   try:
-    os.makedirs(remoteDir)
+    os.makedirs(localDir)
   except:
     pass
 
-  # Setup the remote repo if necessary.
+  # Setup the local repo if necessary.
   try:
-    remoteRepo = Repo(remoteDir)
+    localRepo = Repo(localDir)
   except:
-    remoteRepo = Repo.init(remoteDir)
+    localRepo = Repo.init(localDir)
 
   # Setup local repo to point to remote.
   try:
