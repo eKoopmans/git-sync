@@ -102,9 +102,10 @@ for project in projects:
       print('\t{:10}:\tAlready exists.'.format(branchStr))
 
   # Check if repo is dirty (uncommitted/untracked files).
-  if localRepo.is_dirty(untracked_files=True):
-    print('- Local repo dirty - skipping.\n', flush=True)
-    continue
+  localDirty = localRepo.is_dirty(untracked_files=True)
+  if localDirty:
+    localRepo.git.stash(['save', '--include-untracked'])
+    print('- Local repo dirty - stashing files.', flush=True)
 
   # Fetch from remote.
   print('- Fetching local from remote.', flush=True)
@@ -124,6 +125,23 @@ for project in projects:
   print('- Hard resetting {}.'.format(localRepo.head.ref))
   if not dryrun:
     localRepo.head.reset('--hard')
+
+  # Restore any stashed files (if the main branch was dirty).
+  if localDirty:
+    # Needs to checkout stash for the tracked files AND stash^3
+    # (the third ancestor) for the untracked files.
+    # Info: https://stackoverflow.com/a/55799386/4080966
+    localRepo.git.checkout(['stash', '--', '.'])
+    try:
+      localRepo.git.checkout(['stash^3', '--', '.'])
+    except:
+      pass
+    localRepo.git.stash('drop')
+
+    # Then reset the head to unstage the changes (the checkout above auto-stages).
+    localRepo.head.reset()
+    print('- Stashed files restored.', flush=True)
+    print('  *** Check ALL restored files for clashes. ***', flush=True)
 
   # Progress update.
   print('- {} done!\n'.format(project), flush=True)
