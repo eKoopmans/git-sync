@@ -36,6 +36,8 @@ from argparse import ArgumentParser
 # Helper functions.
 def uniqMerge(a,b):
   return sorted(set(a).union(b))
+def listStr(data):
+  return [str(x) for x in data]
 
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
@@ -132,15 +134,29 @@ for project in projects:
     localDest = localRepo.create_remote(location, remoteDir)
     print('- Created new remote {} in local repo.'.format(location), flush=True)
 
-  # Setup tracking branches.
-  print('- Setting up local branches.', flush=True)
-  for branch in remoteRepo.branches:
-    branchStr = str(branch)
-    try:
-      localRepo.create_head(branchStr, branch).set_tracking_branch(branch)
-      print('\t{:10}:\tAdded.'.format(branchStr))
-    except:
-      print('\t{:10}:\tAlready exists.'.format(branchStr))
+  # Get full list of branches.
+  localBranches = localRepo.branches
+  remoteBranches = remoteRepo.branches
+  branchNames = uniqMerge(listStr(localBranches), listStr(remoteBranches))
+
+  # Sync each branch.
+  print('- Syncing branches.', flush=True)
+  for branchName in branchNames:
+    # Setup local branch if necessary.
+    if not branchName in localBranches:
+      remoteBranch = remoteBranches[branchName]
+      localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
+      print('\t{:10}:\tAdded to local.'.format(branchName))
+    localBranch = localBranches[branchName]
+
+    # Setup remote branch if necessary.
+    if not branchName in remoteBranches:
+      localBranch = localBranches[branchName]
+      remoteRepo.create_head(branchName, localBranch)
+      print('\t{:10}:\tAdded to remote.'.format(branchName))
+    remoteBranch = remoteBranches[branchName]
+
+    # CONTINUE HERE - CHECK IF IT'S NECESSARY TO PUSH, PULL, OR NEITHER.
 
   # Check if repo is dirty (uncommitted/untracked files).
   localDirty = localRepo.is_dirty(untracked_files=True)
