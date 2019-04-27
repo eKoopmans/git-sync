@@ -100,28 +100,37 @@ for project in projects:
   except:
     remoteError = True
 
+  # Skip if neither is a git project.
   if localError and remoteError:
     print('- Not a repo.\n', flush=True)
     continue
 
-  # Setup the local dir if necessary.
-  localDir = os.path.join(local, project)
-  try:
-    os.makedirs(localDir)
-  except:
-    pass
-
-  # Create new repos if necessary.
+  # Create local repo if necessary.
   if localError:
+    try:
+      os.makedirs(localDir)
+      print('- Created local dir {}.'.format(localDir), flush=True)
+    except:
+      pass
     localRepo = Repo.init(localDir)
+    print('- Initialised local repo.', flush=True)
+
+  # Create remote repo if necessary.
   if remoteError:
+    try:
+      os.makedirs(remoteDir)
+      print('- Created remote dir {}.'.format(remoteDir), flush=True)
+    except:
+      pass
     remoteRepo = Repo.init(remoteDir)
+    print('- Initialised remote repo.', flush=True)
 
   # Setup local repo to point to remote.
   try:
     localDest = localRepo.remote(location).set_url(remoteDir)
   except:
     localDest = localRepo.create_remote(location, remoteDir)
+    print('- Created new remote {} in local repo.'.format(location), flush=True)
 
   # Setup tracking branches.
   print('- Setting up local branches.', flush=True)
