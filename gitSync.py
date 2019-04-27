@@ -53,11 +53,10 @@ local = args.local
 projects = args.projects
 
 # Setup variables.
-remote = {
-  #'work': r"Z:\Northcote High School\8. Git",
-  'work': r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST-REMOTE",
-  'home': r"C:\Users\eko\Desktop\VIRTUAL\home"
-}
+if location == 'work':
+  remote = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST-REMOTE"
+else:
+  remote = r"C:\Users\eko\Desktop\VIRTUAL\home"
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
 
 # Setup fetch flag info (to create a summary when pulling).
@@ -82,7 +81,7 @@ for project in projects:
   print(project + ':', flush=True)
 
   # Check if the remote is a git project.
-  remoteDir = os.path.join(remote[location], project)
+  remoteDir = os.path.join(remote, project)
   try:
     remoteRepo = Repo(remoteDir)
   except:
@@ -168,14 +167,14 @@ localDevel = os.path.join(localDir, '.devel')
 if not dryrun and os.path.isdir(localDevel):
   # Setup paths.
   print('Syncing all .devel folders.', flush=True)
-  ffsDevel = os.path.join(remote[location], 'gitDevel.ffs_batch')
+  ffsDevel = os.path.join(remote, 'gitDevel.ffs_batch')
 
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
     shutil.copy2('./template.ffs_batch', ffsDevel)
     with fileinput.FileInput(ffsDevel, inplace=True) as file:
       for line in file:
-        print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote[location]), end='')
+        print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote), end='')
 
   # Run the sync.
   subprocess.call([ffs, ffsDevel])
