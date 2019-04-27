@@ -7,6 +7,19 @@
 
 ### TODO:
 # - check if there's any updates to active branch before stashing/unstashing
+#   git remote update work
+#   localHead=$(git rev-parse @)
+#   remoteHead=$(git rev-parse work/master)
+#   mergeBase=$(git merge-base @ work/master)
+#   if localHead == remoteHead:
+#     #up to date
+#   elif localHead == mergeBase:
+#     #need to pull
+#   elif remoteHead == mergeBase:
+#     #need to push
+#   else:
+#     #diverged
+#
 # - THIS AND GITPUSH:
 #   - add a way to NOT overwrite the remote location (on this and gitPush)
 #   - specify individual projects to push/pull (instead of all)
