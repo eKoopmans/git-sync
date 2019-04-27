@@ -80,11 +80,23 @@ for project in projects:
   # Progress update.
   print(project + ':', flush=True)
 
-  # Check if the remote is a git project.
+  # Check if local is a git project.
+  localDir = os.path.join(local, project)
+  try:
+    localRepo = Repo(localDir)
+    localError = False
+  except:
+    localError = True
+
+  # Check if remote is a git project.
   remoteDir = os.path.join(remote, project)
   try:
     remoteRepo = Repo(remoteDir)
+    remoteError = False
   except:
+    remoteError = True
+
+  if localError and remoteError:
     print('- Not a repo.\n', flush=True)
     continue
 
@@ -95,11 +107,11 @@ for project in projects:
   except:
     pass
 
-  # Setup the local repo if necessary.
-  try:
-    localRepo = Repo(localDir)
-  except:
+  # Create new repos if necessary.
+  if localError:
     localRepo = Repo.init(localDir)
+  if remoteError:
+    remoteRepo = Repo.init(remoteDir)
 
   # Setup local repo to point to remote.
   try:
