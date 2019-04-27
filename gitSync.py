@@ -50,7 +50,7 @@ args = parser.parse_args()
 location = args.location
 dryrun = args.dryrun
 local = args.local
-projects = args.projects or next(os.walk(local))[1]
+projects = args.projects
 
 # Setup variables.
 remote = {
@@ -71,6 +71,10 @@ fetchFlags = [
   '[fast forward]',
   '[error]'
 ]
+
+# Gather projects if not explicitly set.
+if not projects:
+  projects = sorted(set().union(next(os.walk(local))[1], next(os.walk(remote))[1]))
 
 # Loop through all dirs.
 for project in projects:
