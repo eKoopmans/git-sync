@@ -33,6 +33,10 @@ import subprocess
 from git import Repo
 from argparse import ArgumentParser
 
+# Helper functions.
+def uniqMerge(a,b):
+  return sorted(set(a).union(b))
+
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
 parser.add_argument('local', metavar='LOCAL', nargs='?', default='.',
@@ -73,7 +77,7 @@ fetchFlags = [
 
 # Gather projects if not explicitly set.
 if not projects:
-  projects = sorted(set().union(next(os.walk(local))[1], next(os.walk(remote))[1]))
+  projects = uniqMerge(next(os.walk(local))[1], next(os.walk(remote))[1])
 
 # Loop through all dirs.
 for project in projects:
