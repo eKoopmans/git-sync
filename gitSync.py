@@ -131,6 +131,7 @@ if not projects:
 # Fix if inside a git repo.
 if '.git' in projects:
   projects = [os.getcwd().split(os.sep)[-1]]
+  local = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 # Loop through all dirs.
 for project in projects:
