@@ -26,6 +26,38 @@ def uniqMerge(a,b):
 def listStr(data):
   return [str(x) for x in data]
 
+# Function to stash/unstash before modifying active branch.
+def stashRun(toRun, repo, branchName, location):
+  # If branch is not the active branch, just run the function.
+  if repo.active_branch.name != branchName:
+    return toRun()
+
+  # Check if repo is dirty (uncommitted/untracked files).
+  isDirty = repo.is_dirty(untracked_files=True)
+  if isDirty:
+    localRepo.git.stash(['save', '--include-untracked'])
+    print('- {} repo dirty - stashing files.'.format(location.title), flush=True)
+
+  # Run the function.
+  toRun()
+
+  # Restore any stashed files (if the main branch was dirty).
+  if isDirty:
+    # Needs to checkout stash for the tracked files AND stash^3
+    # (the third ancestor) for the untracked files.
+    # Info: https://stackoverflow.com/a/55799386/4080966
+    localRepo.git.checkout(['stash', '--', '.'])
+    try:
+      localRepo.git.checkout(['stash^3', '--', '.'])
+    except:
+      pass
+    localRepo.git.stash('drop')
+
+    # Then reset the head to unstage the changes (the checkout above auto-stages).
+    localRepo.head.reset()
+    print('- Stashed files restored.', flush=True)
+    print('  *** Check ALL restored files for clashes. ***', flush=True)
+
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
 parser.add_argument('local', metavar='LOCAL', nargs='?', default='.',
