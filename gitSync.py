@@ -25,6 +25,8 @@ def uniqMerge(a,b):
   return sorted(set(a).union(b))
 def listStr(data):
   return [str(x) for x in data]
+def branchPrint(branchName, text):
+  print('\t{:10}:\t{}'.format(branchName, text), flush=True)
 
 # Function to stash/unstash before modifying active branch.
 def stashRun(toRun, repo, branchName, location):
@@ -66,9 +68,9 @@ def gitPull(localDest, branchName, dryrun):
       localDest.pull([branchName, '--dry-run'])
     else:
       localDest.pull([branchName])
-    print('\t{:10}:\tPulled from remote.'.format(branchName), flush=True)
+    branchPrint(branchName, 'Pulled from remote.')
   except:
-    print('\t{:10}:\tError pulling.')
+    branchPrint(branchName, 'Error pulling.')
 
 # Push function.
 def gitPush(localDest, branchName, dryrun):
@@ -78,9 +80,9 @@ def gitPush(localDest, branchName, dryrun):
       localDest.push([branchName, '--follow-tags', '--dry-run'])
     else:
       localDest.push([branchName, '--follow-tags'])
-    print('\t{:10}:\tPushed to remote.'.format(branchName), flush=True)
+    branchPrint(branchName, 'Pushed to remote.')
   except:
-    print('\t{:10}:\tError pushing.')
+    branchPrint(branchName, 'Error pushing.')
 
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
@@ -194,19 +196,19 @@ for project in projects:
     if not branchName in localBranches:
       remoteBranch = remoteBranches[branchName]
       localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
-      print('\t{:10}:\tAdded to local.'.format(branchName), flush=True)
+      branchPrint(branchName, 'Created in local.')
     localBranch = localBranches[branchName]
 
     # Setup remote branch if necessary.
     if not branchName in remoteBranches:
       localBranch = localBranches[branchName]
       remoteRepo.create_head(branchName, localBranch)
-      print('\t{:10}:\tAdded to remote.'.format(branchName), flush=True)
+      branchPrint(branchName, 'Created in remote.')
     remoteBranch = remoteBranches[branchName]
 
     # Sync the repos (push, pull, or neither).
     if localBranch.commit == remoteBranch.commit:
-      print('\t{:10}:\tUp to date.'.format(branchName), flush=True)
+      branchPrint(branchName, 'Up to date.')
     else:
       mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
       if mergeBase == localBranch.commit:
@@ -214,7 +216,7 @@ for project in projects:
       elif mergeBase == remoteBranch.commit:
         stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, location)
       else:
-        print('\t{:10}:\tError - branches are diverged.'.format(branchName), flush=True)
+        branchPrint(branchName, 'Error - branches are diverged.')
 
   # Progress update.
   print('- {} done!\n'.format(project), flush=True)
