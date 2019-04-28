@@ -25,13 +25,13 @@ from functools import partial
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
 parser.add_argument('projects', metavar='PROJECT', nargs='*',
-                    help='The names of each project to run (default: * in local)')
+                    help='The names of each project to run (default: * in local and remote)')
 parser.add_argument('-t', '--target', dest='target', metavar='TARGET', default='local',
                     help='The name of the target remote location (default: local)')
 parser.add_argument('-l', '--local', dest='local', metavar='LOCAL', default='.',
                     help='The local root of the projects (default: current dir)')
-parser.add_argument('-r', '--remote', dest='remote', metavar='REMOTE', default='.',
-                    help='The remote root of the projects (default: current dir)')
+parser.add_argument('-r', '--remote', dest='remote', metavar='REMOTE', default='',
+                    help='If specified, the remote root of the projects (default: empty)')
 parser.add_argument('-d', '--dry-run', dest='dryrun', default=False,
                     action='store_true', help='Perform a dry-run')
 
@@ -127,7 +127,9 @@ fetchFlags = [
 
 # Gather projects if not explicitly set.
 if not projects:
-  projects = uniqMerge(next(os.walk(local))[1], next(os.walk(remote))[1])
+  projects = next(os.walk(local))[1]
+  if remote:
+    projects = uniqMerge(projects, next(os.walk(remote))[1])
 
 # Fix if inside a git repo.
 if '.git' in projects:
@@ -148,12 +150,25 @@ for project in projects:
     localError = True
 
   # Check if remote is a git project.
-  remoteDir = os.path.join(remote, project)
-  try:
-    remoteRepo = Repo(remoteDir)
-    remoteError = False
-  except:
+  if remote:
+    remoteDir = os.path.join(remote, project)
+    try:
+      remoteRepo = Repo(remoteDir)
+      remoteError = False
+    except:
+      remoteError = True
+
+  # Get remote dir and repo from the local repo, if possible.
+  elif localError:
     remoteError = True
+  else:
+    try:
+      remoteDir = next(localRepo.remote(target).urls)
+      remoteRepo = Repo(remoteDir)
+      remoteError = False
+    except:
+      print('- Remote target is not defined.\n', flush=True)
+      continue
 
   # Skip if neither is a git project.
   if localError and remoteError:
