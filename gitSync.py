@@ -210,6 +210,10 @@ for project in projects:
     localDest = localRepo.create_remote(target, remoteDir)
     print('- Created new remote {} in local repo.'.format(target), flush=True)
 
+  # Enable pushing directly to remote.
+  with remoteRepo.config_writer() as cw:
+    cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
+
   # Get full list of branches.
   localBranches = localRepo.branches
   remoteBranches = remoteRepo.branches
