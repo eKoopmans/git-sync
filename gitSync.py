@@ -248,22 +248,26 @@ for project in projects:
   print('- {} done!\n'.format(project), flush=True)
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
-print('Syncing all .devel folders.', flush=True)
+print('Syncing all .devel folders:', flush=True)
 ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(target))
 
 # Check that sync file exists or can be created.
 if not remote and not os.path.exists(ffsDevel):
-  print('- Unable to setup sync, no remote directory specified.', flush=True)
-elif not dryrun:
-  # Create the FFS sync file if it doesn't exist.
-  if not os.path.exists(ffsDevel):
-    shutil.copy2(os.path.join(userdir, 'bin', 'template.ffs_batch'), ffsDevel)
-    with fileinput.FileInput(ffsDevel, inplace=True) as file:
-      for line in file:
-        print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote), end='')
+  print('- Unable to setup sync, no remote directory specified.\n', flush=True)
+else:
+  if not dryrun:
+    # Create the FFS sync file if it doesn't exist.
+    if not os.path.exists(ffsDevel):
+      shutil.copy2(os.path.join(userdir, 'bin', 'template.ffs_batch'), ffsDevel)
+      with fileinput.FileInput(ffsDevel, inplace=True) as file:
+        for line in file:
+          print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote), end='')
 
-  # Run the sync.
-  subprocess.call([ffs, ffsDevel])
+    # Run the sync.
+    subprocess.call([ffs, ffsDevel])
+
+  # Progress update.
+  print('- Syncing .devel done!\n', flush=True)
 
 # Progress update.
 print('Sync complete!', flush=True)
