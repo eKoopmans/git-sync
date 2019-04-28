@@ -128,6 +128,10 @@ fetchFlags = [
 if not projects:
   projects = uniqMerge(next(os.walk(local))[1], next(os.walk(remote))[1])
 
+# Fix if inside a git repo.
+if '.git' in projects:
+  projects = [os.getcwd().split(os.sep)[-1]]
+
 # Loop through all dirs.
 for project in projects:
   # Progress update.
