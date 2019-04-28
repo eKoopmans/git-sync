@@ -38,7 +38,7 @@ def stashRun(toRun, repo, branchName, location):
   isDirty = repo.is_dirty(untracked_files=True)
   if isDirty:
     localRepo.git.stash(['save', '--include-untracked'])
-    print('- {} repo dirty - stashing files.'.format(location.title()), flush=True)
+    branchPrint(branchName, 'Stashing files ({} dirty).'.format(location))
 
   # Run the function.
   toRun()
@@ -57,8 +57,8 @@ def stashRun(toRun, repo, branchName, location):
 
     # Then reset the head to unstage the changes (the checkout above auto-stages).
     localRepo.head.reset()
-    print('- Stashed files restored.', flush=True)
-    print('  *** Check ALL restored files for clashes. ***', flush=True)
+    branchPrint(branchName, 'Stash restored.')
+    branchPrint(branchName, '*IMPORTANT:* Check all restored files for clashes.')
 
 # Pull function.
 def gitPull(localDest, branchName, dryrun):
