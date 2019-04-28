@@ -89,28 +89,26 @@ def gitPush(localDest, branchName, dryrun):
 
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
-parser.add_argument('local', metavar='LOCAL', nargs='?', default='.',
-                    help='The local root of the projects (default: current dir)')
 parser.add_argument('projects', metavar='PROJECT', nargs='*',
                     help='The names of each project to run (default: * in local)')
-parser.add_argument('-l', '--location', dest='location', metavar='LOCATION', default='work',
-                    help='Remote location (work or home)')
-parser.add_argument('-d', '--dry-run', dest='dryrun',
-                    action='store_true', default=False,
-                    help='Perform a dry-run')
+parser.add_argument('-t', '--target', dest='target', metavar='TARGET', default='local',
+                    help='The name of the target remote location (default: local)')
+parser.add_argument('-l', '--local', dest='local', metavar='LOCAL', default='.',
+                    help='The local root of the projects (default: current dir)')
+parser.add_argument('-r', '--remote', dest='remote', metavar='REMOTE', default='.',
+                    help='The remote root of the projects (default: current dir)')
+parser.add_argument('-d', '--dry-run', dest='dryrun', default=False,
+                    action='store_true', help='Perform a dry-run')
 
 # Parse arguments.
 args = parser.parse_args()
-location = args.location
-dryrun = args.dryrun
-local = args.local
 projects = args.projects
+target = args.target
+local = args.local
+remote = args.remote
+dryrun = args.dryrun
 
 # Setup variables.
-if location == 'work':
-  remote = r"C:\Users\eko\Desktop\Northcote High School\8. Git\TEST-REMOTE"
-else:
-  remote = r"C:\Users\eko\Desktop\VIRTUAL\home"
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
 
 # Setup fetch flag info (to create a summary when pulling).
@@ -182,10 +180,10 @@ for project in projects:
 
   # Setup local repo to point to remote.
   try:
-    localDest = localRepo.remote(location).set_url(remoteDir)
+    localDest = localRepo.remote(target).set_url(remoteDir)
   except:
-    localDest = localRepo.create_remote(location, remoteDir)
-    print('- Created new remote {} in local repo.'.format(location), flush=True)
+    localDest = localRepo.create_remote(target, remoteDir)
+    print('- Created new remote {} in local repo.'.format(target), flush=True)
 
   # Get full list of branches.
   localBranches = localRepo.branches
@@ -217,7 +215,7 @@ for project in projects:
       if mergeBase == localBranch.commit:
         stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
       elif mergeBase == remoteBranch.commit:
-        stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, location)
+        stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, target)
       else:
         branchPrint(branchName, 'Error - branches are diverged.')
 
@@ -228,7 +226,7 @@ for project in projects:
 print('Syncing all .devel folders.', flush=True)
 if not dryrun:
   # Setup paths.
-  ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(location))
+  ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(target))
 
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
