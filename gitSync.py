@@ -6,7 +6,6 @@
 #   gitSync [ARGUMENTS]
 
 ### TODO:
-# - check if there's any updates to active branch before stashing/unstashing
 # - THIS AND GITPUSH:
 #   - add a way to NOT overwrite the remote location (on this and gitPush)
 #   - specify individual projects to push/pull (instead of all)
@@ -62,29 +61,26 @@ def stashRun(toRun, repo, branchName, location):
 # Pull function.
 def gitPull(localDest, branchName, dryrun):
   # Pull from remote.
-  print('- Pulling {}.'.format(branchName), flush=True)
   try:
     if dryrun:
-      infoList = localDest.pull([branchName, '--dry-run'])
+      localDest.pull([branchName, '--dry-run'])
     else:
-      infoList = localDest.fetch([branchName, '--update-head-ok'])
-    for info in infoList:
-      summary = [fetchFlags[i] for i in range(0,len(fetchFlags)) if info.flags & 2**i]
-      summary = ' '.join(summary)
-      print('\t{:10}:\t{}'.format(str(info.ref), summary))
+      localDest.pull([branchName])
+    print('\t{:10}:\tPulled from remote.'.format(branchName), flush=True)
   except:
-    print('\tError fetching (local may have unpushed commits).')
+    print('\t{:10}:\tError pulling.')
 
 # Push function.
 def gitPush(localDest, branchName, dryrun):
   # Push to remote.
-  print('- Pushing {}.'.format(branchName), flush=True)
-  if dryrun:
-    infoList = localDest.push([branchName, '--follow-tags', '--dry-run'])
-  else:
-    infoList = localDest.push([branchName, '--follow-tags'])
-  for info in infoList:
-    print('\t{:10}:\t{}'.format(str(info.local_ref), info.summary.strip('\r\n')), flush=True)
+  try:
+    if dryrun:
+      localDest.push([branchName, '--follow-tags', '--dry-run'])
+    else:
+      localDest.push([branchName, '--follow-tags'])
+    print('\t{:10}:\tPushed to remote.'.format(branchName), flush=True)
+  except:
+    print('\t{:10}:\tError pushing.')
 
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
@@ -215,10 +211,8 @@ for project in projects:
       mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
       if mergeBase == localBranch.commit:
         stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
-        print('\t{:10}:\tPulled from remote.'.format(branchName), flush=True)
       elif mergeBase == remoteBranch.commit:
         stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, location)
-        print('\t{:10}:\tPushed to remote.'.format(branchName), flush=True)
       else:
         print('\t{:10}:\tError - branches are diverged.'.format(branchName), flush=True)
 
