@@ -19,6 +19,7 @@ import fileinput
 import subprocess
 from git import Repo
 from argparse import ArgumentParser
+from functools import partial
 
 # Helper functions.
 def uniqMerge(a,b):
@@ -57,6 +58,33 @@ def stashRun(toRun, repo, branchName, location):
     localRepo.head.reset()
     print('- Stashed files restored.', flush=True)
     print('  *** Check ALL restored files for clashes. ***', flush=True)
+
+# Pull function.
+def gitPull(localDest, branchName, dryrun):
+  # Pull from remote.
+  print('- Pulling {}.'.format(branchName), flush=True)
+  try:
+    if dryrun:
+      infoList = localDest.pull([branchName, '--dry-run'])
+    else:
+      infoList = localDest.fetch([branchName, '--update-head-ok'])
+    for info in infoList:
+      summary = [fetchFlags[i] for i in range(0,len(fetchFlags)) if info.flags & 2**i]
+      summary = ' '.join(summary)
+      print('\t{:10}:\t{}'.format(str(info.ref), summary))
+  except:
+    print('\tError fetching (local may have unpushed commits).')
+
+# Push function.
+def gitPush(localDest, branchName, dryrun):
+  # Push to remote.
+  print('- Pushing {}.'.format(branchName), flush=True)
+  if dryrun:
+    infoList = localDest.push([branchName, '--follow-tags', '--dry-run'])
+  else:
+    infoList = localDest.push([branchName, '--follow-tags'])
+  for info in infoList:
+    print('\t{:10}:\t{}'.format(str(info.local_ref), info.summary.strip('\r\n')), flush=True)
 
 # Setup command-line arguments.
 parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
@@ -181,53 +209,13 @@ for project in projects:
     else:
       mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
       if mergeBase == localBranch.commit:
+        stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
         print('\t{:10}:\tPulled from remote.'.format(branchName), flush=True)
       elif mergeBase == remoteBranch.commit:
+        stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, location)
         print('\t{:10}:\tPushed to remote.'.format(branchName), flush=True)
       else:
         print('\t{:10}:\tError - branches are diverged.'.format(branchName), flush=True)
-
-  # Check if repo is dirty (uncommitted/untracked files).
-  localDirty = localRepo.is_dirty(untracked_files=True)
-  if localDirty:
-    localRepo.git.stash(['save', '--include-untracked'])
-    print('- Local repo dirty - stashing files.', flush=True)
-
-  # Fetch from remote.
-  print('- Fetching local from remote.', flush=True)
-  try:
-    if dryrun:
-      infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok', '--dry-run'])
-    else:
-      infoList = localDest.fetch(['refs/heads/*:refs/heads/*', 'refs/tags/*:refs/tags/*', '--update-head-ok'])
-    for info in infoList:
-      summary = [fetchFlags[i] for i in range(0,len(fetchFlags)) if info.flags & 2**i]
-      summary = ' '.join(summary)
-      print('\t{:10}:\t{}'.format(str(info.ref), summary))
-  except:
-    print('\tError fetching (local may have unpushed commits).')
-
-  # Reset current branch (necessary if current branch was fetched to).
-  print('- Hard resetting {}.'.format(localRepo.head.ref))
-  if not dryrun:
-    localRepo.head.reset('--hard')
-
-  # Restore any stashed files (if the main branch was dirty).
-  if localDirty:
-    # Needs to checkout stash for the tracked files AND stash^3
-    # (the third ancestor) for the untracked files.
-    # Info: https://stackoverflow.com/a/55799386/4080966
-    localRepo.git.checkout(['stash', '--', '.'])
-    try:
-      localRepo.git.checkout(['stash^3', '--', '.'])
-    except:
-      pass
-    localRepo.git.stash('drop')
-
-    # Then reset the head to unstage the changes (the checkout above auto-stages).
-    localRepo.head.reset()
-    print('- Stashed files restored.', flush=True)
-    print('  *** Check ALL restored files for clashes. ***', flush=True)
 
   # Progress update.
   print('- {} done!\n'.format(project), flush=True)
