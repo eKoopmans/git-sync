@@ -1,2 +1,4 @@
 @echo off
-python %USERPROFILE%\bin\gitSync.py %*
+SETLOCAL
+SET SETTINGS=
+python %USERPROFILE%\bin\gitSync.py %SETTINGS% %*

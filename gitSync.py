@@ -2,14 +2,16 @@
 # 1. Add ~/bin to PATH
 #   (~ is %USERPROFILE% in Windows)
 # 2. Copy this, gitSync.cmd, and template.ffs_batch to ~/bin
-# 3. Run from your desired Git folder:
+# 3. Set any desired default settings inside gitSync.cmd
+#    (e.g. SETTINGS=-t work -r "path/to/work/dir")
+# 4. Run from your desired Git folder:
 #   gitSync [ARGUMENTS]
 
 ### TODO:
-# - THIS AND GITPUSH:
-#   - add a way to NOT overwrite the remote location (on this and gitPush)
-#   - specify individual projects to push/pull (instead of all)
-#     - might require modifying the .devel sync...
+# - add a way to NOT overwrite the remote location
+#   - e.g. use the existing location of the remote, if "-r" is not specified
+#   - problem is that "-r" is for the entire parent directory, not one repo...
+# - fix .devel sync to only sync specified projects (instead of all)
 
 # Imports.
 import os
