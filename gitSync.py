@@ -1,7 +1,7 @@
 ### INSTRUCTIONS:
 # 1. Add ~/bin to PATH
 #   (~ is %USERPROFILE% in Windows)
-# 2. Copy this and gitSync.cmd to ~/bin
+# 2. Copy this, gitSync.cmd, and template.ffs_batch to ~/bin
 # 3. Run from your desired Git folder:
 #   gitSync [ARGUMENTS]
 
@@ -232,7 +232,7 @@ if not dryrun:
 
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
-    shutil.copy2('./template.ffs_batch', ffsDevel)
+    shutil.copy2(os.path.join(os.environ['USERPROFILE'], 'bin', 'template.ffs_batch'), ffsDevel)
     with fileinput.FileInput(ffsDevel, inplace=True) as file:
       for line in file:
         print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote), end='')
@@ -241,4 +241,4 @@ if not dryrun:
   subprocess.call([ffs, ffsDevel])
 
 # Progress update.
-print('All done!', flush=True)
+print('Sync complete!', flush=True)
