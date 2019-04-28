@@ -37,7 +37,7 @@ def stashRun(toRun, repo, branchName, location):
   isDirty = repo.is_dirty(untracked_files=True)
   if isDirty:
     localRepo.git.stash(['save', '--include-untracked'])
-    print('- {} repo dirty - stashing files.'.format(location.title), flush=True)
+    print('- {} repo dirty - stashing files.'.format(location.title()), flush=True)
 
   # Run the function.
   toRun()
