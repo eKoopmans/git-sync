@@ -225,11 +225,10 @@ for project in projects:
   print('- {} done!\n'.format(project), flush=True)
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
-localDevel = os.path.join(localDir, '.devel')
-if not dryrun and os.path.isdir(localDevel):
+print('Syncing all .devel folders.', flush=True)
+if not dryrun:
   # Setup paths.
-  print('Syncing all .devel folders.', flush=True)
-  ffsDevel = os.path.join(remote, 'gitDevel.ffs_batch')
+  ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(location))
 
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
