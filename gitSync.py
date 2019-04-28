@@ -7,19 +7,6 @@
 
 ### TODO:
 # - check if there's any updates to active branch before stashing/unstashing
-#   git remote update work
-#   localHead=$(git rev-parse @)
-#   remoteHead=$(git rev-parse work/master)
-#   mergeBase=$(git merge-base @ work/master)
-#   if localHead == remoteHead:
-#     #up to date
-#   elif localHead == mergeBase:
-#     #need to pull
-#   elif remoteHead == mergeBase:
-#     #need to push
-#   else:
-#     #diverged
-#
 # - THIS AND GITPUSH:
 #   - add a way to NOT overwrite the remote location (on this and gitPush)
 #   - specify individual projects to push/pull (instead of all)
@@ -146,17 +133,27 @@ for project in projects:
     if not branchName in localBranches:
       remoteBranch = remoteBranches[branchName]
       localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
-      print('\t{:10}:\tAdded to local.'.format(branchName))
+      print('\t{:10}:\tAdded to local.'.format(branchName), flush=True)
     localBranch = localBranches[branchName]
 
     # Setup remote branch if necessary.
     if not branchName in remoteBranches:
       localBranch = localBranches[branchName]
       remoteRepo.create_head(branchName, localBranch)
-      print('\t{:10}:\tAdded to remote.'.format(branchName))
+      print('\t{:10}:\tAdded to remote.'.format(branchName), flush=True)
     remoteBranch = remoteBranches[branchName]
 
-    # CONTINUE HERE - CHECK IF IT'S NECESSARY TO PUSH, PULL, OR NEITHER.
+    # Sync the repos (push, pull, or neither).
+    if localBranch.commit == remoteBranch.commit:
+      print('\t{:10}:\tUp to date.'.format(branchName), flush=True)
+    else:
+      mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
+      if mergeBase == localBranch.commit:
+        print('\t{:10}:\tPulled from remote.'.format(branchName), flush=True)
+      elif mergeBase == remoteBranch.commit:
+        print('\t{:10}:\tPushed to remote.'.format(branchName), flush=True)
+      else:
+        print('\t{:10}:\tError - branches are diverged.'.format(branchName), flush=True)
 
   # Check if repo is dirty (uncommitted/untracked files).
   localDirty = localRepo.is_dirty(untracked_files=True)
