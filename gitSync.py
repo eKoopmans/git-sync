@@ -8,9 +8,6 @@
 #   gitSync [ARGUMENTS]
 
 ### TODO:
-# - add a way to NOT overwrite the remote location
-#   - e.g. use the existing location of the remote, if "-r" is not specified
-#   - problem is that "-r" is for the entire parent directory, not one repo...
 # - fix .devel sync to only sync specified projects (instead of all)
 
 # Imports.
@@ -114,6 +111,10 @@ def gitPush(localDest, branchName, dryrun):
 
 # Setup variables.
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
+try:
+  userdir = os.environ['USERPROFILE']
+except:
+  userdir = os.path.exanduser('~')
 
 # Setup fetch flag info (to create a summary when pulling).
 fetchFlags = [
@@ -256,7 +257,7 @@ if not remote and not os.path.exists(ffsDevel):
 elif not dryrun:
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
-    shutil.copy2(os.path.join(os.environ['USERPROFILE'], 'bin', 'template.ffs_batch'), ffsDevel)
+    shutil.copy2(os.path.join(userdir, 'bin', 'template.ffs_batch'), ffsDevel)
     with fileinput.FileInput(ffsDevel, inplace=True) as file:
       for line in file:
         print(line.replace('%LOCAL%', local).replace('%REMOTE%', remote), end='')
