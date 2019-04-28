@@ -1,9 +1,9 @@
 ### INSTRUCTIONS:
 # 1. Add ~/bin to PATH
 #   (~ is %USERPROFILE% in Windows)
-# 2. Copy this and gitPull.cmd to ~/bin
+# 2. Copy this and gitSync.cmd to ~/bin
 # 3. Run from your desired Git folder:
-#   gitPull [ARGUMENTS]
+#   gitSync [ARGUMENTS]
 
 ### TODO:
 # - check if there's any updates to active branch before stashing/unstashing
