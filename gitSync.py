@@ -138,6 +138,11 @@ if '.git' in projects:
   projects = [local.split(os.sep)[-1]]
   local = parentDir(local)
 
+# Fix local and remote to be absolute paths.
+local = os.path.abspath(local)
+if remote:
+  remote = os.path.abspath(remote)
+
 # Loop through all dirs.
 for project in projects:
   # Progress update.
