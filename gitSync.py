@@ -248,10 +248,12 @@ for project in projects:
 
 # Synchronise all .devel folders with FreeFileSync (FFS).
 print('Syncing all .devel folders.', flush=True)
-if not dryrun:
-  # Setup paths.
-  ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(target))
+ffsDevel = os.path.join(local, '{}Devel.ffs_batch'.format(target))
 
+# Check that sync file exists or can be created.
+if not remote and not os.path.exists(ffsDevel):
+  print('- Unable to setup sync, no remote directory specified.', flush=True)
+elif not dryrun:
   # Create the FFS sync file if it doesn't exist.
   if not os.path.exists(ffsDevel):
     shutil.copy2(os.path.join(os.environ['USERPROFILE'], 'bin', 'template.ffs_batch'), ffsDevel)
