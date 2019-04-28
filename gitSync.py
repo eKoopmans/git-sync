@@ -22,6 +22,27 @@ from git import Repo
 from argparse import ArgumentParser
 from functools import partial
 
+# Setup command-line arguments.
+parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
+parser.add_argument('projects', metavar='PROJECT', nargs='*',
+                    help='The names of each project to run (default: * in local)')
+parser.add_argument('-t', '--target', dest='target', metavar='TARGET', default='local',
+                    help='The name of the target remote location (default: local)')
+parser.add_argument('-l', '--local', dest='local', metavar='LOCAL', default='.',
+                    help='The local root of the projects (default: current dir)')
+parser.add_argument('-r', '--remote', dest='remote', metavar='REMOTE', default='.',
+                    help='The remote root of the projects (default: current dir)')
+parser.add_argument('-d', '--dry-run', dest='dryrun', default=False,
+                    action='store_true', help='Perform a dry-run')
+
+# Parse arguments.
+args = parser.parse_args()
+projects = args.projects
+target = args.target
+local = args.local
+remote = args.remote
+dryrun = args.dryrun
+
 # Helper functions.
 def uniqMerge(a,b):
   return sorted(set(a).union(b))
@@ -88,27 +109,6 @@ def gitPush(localDest, branchName, dryrun):
     branchPrint(branchName, 'Pushed to remote.')
   except:
     branchPrint(branchName, 'Error pushing.')
-
-# Setup command-line arguments.
-parser = ArgumentParser(description='Pull all specified Git projects from a remote location.')
-parser.add_argument('projects', metavar='PROJECT', nargs='*',
-                    help='The names of each project to run (default: * in local)')
-parser.add_argument('-t', '--target', dest='target', metavar='TARGET', default='local',
-                    help='The name of the target remote location (default: local)')
-parser.add_argument('-l', '--local', dest='local', metavar='LOCAL', default='.',
-                    help='The local root of the projects (default: current dir)')
-parser.add_argument('-r', '--remote', dest='remote', metavar='REMOTE', default='.',
-                    help='The remote root of the projects (default: current dir)')
-parser.add_argument('-d', '--dry-run', dest='dryrun', default=False,
-                    action='store_true', help='Perform a dry-run')
-
-# Parse arguments.
-args = parser.parse_args()
-projects = args.projects
-target = args.target
-local = args.local
-remote = args.remote
-dryrun = args.dryrun
 
 # Setup variables.
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
