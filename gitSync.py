@@ -48,6 +48,8 @@ def uniqMerge(a,b):
   return sorted(set(a).union(b))
 def listStr(data):
   return [str(x) for x in data]
+def parentDir(path):
+  return os.path.abspath(os.path.join(path, os.pardir))
 def branchPrint(branchName, text):
   print('\t{:10}:\t{}'.format(branchName, text), flush=True)
 
@@ -133,8 +135,8 @@ if not projects:
 
 # Fix if inside a git repo.
 if '.git' in projects:
-  projects = [os.getcwd().split(os.sep)[-1]]
-  local = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+  projects = [local.split(os.sep)[-1]]
+  local = parentDir(local)
 
 # Loop through all dirs.
 for project in projects:
