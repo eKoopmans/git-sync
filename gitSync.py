@@ -37,7 +37,8 @@ def stashRun(toRun, repo, branchName, location):
   # Check if repo is dirty (uncommitted/untracked files).
   isDirty = repo.is_dirty(untracked_files=True)
   if isDirty:
-    localRepo.git.stash(['save', '--include-untracked'])
+    if not dryrun:
+      localRepo.git.stash(['save', '--include-untracked'])
     branchPrint(branchName, 'Stashing files ({} dirty).'.format(location))
 
   # Run the function.
@@ -45,18 +46,20 @@ def stashRun(toRun, repo, branchName, location):
 
   # Restore any stashed files (if the main branch was dirty).
   if isDirty:
-    # Needs to checkout stash for the tracked files AND stash^3
-    # (the third ancestor) for the untracked files.
-    # Info: https://stackoverflow.com/a/55799386/4080966
-    localRepo.git.checkout(['stash', '--', '.'])
-    try:
-      localRepo.git.checkout(['stash^3', '--', '.'])
-    except:
-      pass
-    localRepo.git.stash('drop')
+    if not dryrun:
+      # Needs to checkout stash AND stash^3 for tracked and untracked files.
+      # Info: https://stackoverflow.com/a/55799386/4080966
+      localRepo.git.checkout(['stash', '--', '.'])
+      try:
+        localRepo.git.checkout(['stash^3', '--', '.'])
+      except:
+        pass
+      localRepo.git.stash('drop')
 
-    # Then reset the head to unstage the changes (the checkout above auto-stages).
-    localRepo.head.reset()
+      # Then reset the head to unstage the changes (the checkout above auto-stages).
+      localRepo.head.reset()
+
+    # Progress update.
     branchPrint(branchName, 'Stash restored.')
     branchPrint(branchName, '*IMPORTANT:* Check all restored files for clashes.')
 
