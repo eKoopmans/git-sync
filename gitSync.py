@@ -89,13 +89,14 @@ def stashRun(toRun, repo, branchName, location):
 def gitPull(localDest, branchName, dryrun):
   # Pull from remote.
   try:
+    refspec = '{}:{}'.format(branchName, branchName)
     if dryrun:
-      localDest.pull([branchName, '--dry-run'])
+      localDest.fetch([refspec, '--update-head-ok', '--dry-run'])
     else:
-      localDest.pull([branchName])
-    branchPrint(branchName, 'Pulled from remote.')
+      localDest.fetch([refspec, '--update-head-ok'])
+    branchPrint(branchName, 'Fetched from remote.')
   except:
-    branchPrint(branchName, 'Error pulling.')
+    branchPrint(branchName, 'Error fetching.')
 
 # Push function.
 def gitPush(localDest, branchName, dryrun):
