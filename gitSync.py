@@ -210,10 +210,6 @@ for project in projects:
     localDest = localRepo.create_remote(target, remoteDir)
     print('- Created new remote {} in local repo.'.format(target), flush=True)
 
-  # Fetch from remote (necessary for setting up local branches and pulling).
-  localDest.fetch()
-  print('- Fetched remote {} in local repo.'.format(target), flush=True)
-
   # Enable pushing directly to remote.
   with remoteRepo.config_writer() as cw:
     cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
@@ -226,33 +222,27 @@ for project in projects:
   # Sync each branch.
   print('- Syncing branches.', flush=True)
   for branchName in branchNames:
-    # Setup local branch if necessary.
+    # Handle when the branch doesn't exist in local or remote.
     if not branchName in localBranches:
-      remoteBranch = localDest.refs[branchName]
-      localBranch = localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
       branchPrint(branchName, 'Created in local.')
-    else:
-      localBranch = localBranches[branchName]
-
-    # Setup remote branch if necessary.
-    if not branchName in remoteBranches:
-      localBranch = localBranches[branchName]
-      remoteBranch = remoteRepo.create_head(branchName, localBranch)
+      stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
+    elif not branchName in remoteBranches:
       branchPrint(branchName, 'Created in remote.')
+      stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, target)
     else:
+      # Sync the repos (push, pull, or neither).
+      localBranch = localBranches[branchName]
       remoteBranch = remoteBranches[branchName]
-
-    # Sync the repos (push, pull, or neither).
-    if localBranch.commit == remoteBranch.commit:
-      branchPrint(branchName, 'Up to date.')
-    else:
-      mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
-      if mergeBase == localBranch.commit:
-        stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
-      elif mergeBase == remoteBranch.commit:
-        stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, target)
+      if localBranch.commit == remoteBranch.commit:
+        branchPrint(branchName, 'Up to date.')
       else:
-        branchPrint(branchName, 'Error - branches are diverged.')
+        mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
+        if mergeBase == localBranch.commit:
+          stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
+        elif mergeBase == remoteBranch.commit:
+          stashRun(partial(gitPush, localDest, branchName, dryrun), remoteRepo, branchName, target)
+        else:
+          branchPrint(branchName, 'Error - branches are diverged.')
 
   # Progress update.
   print('- {} done!\n'.format(project), flush=True)
