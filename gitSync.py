@@ -103,9 +103,9 @@ def gitPush(localDest, branchName, dryrun):
   # Push to remote.
   try:
     if dryrun:
-      localDest.push([branchName, '--follow-tags', '--dry-run'])
+      localDest.push([branchName, '--tags', '--dry-run'])
     else:
-      localDest.push([branchName, '--follow-tags'])
+      localDest.push([branchName, '--tags'])
     branchPrint(branchName, 'Pushed to remote.')
   except:
     branchPrint(branchName, 'Error pushing.')
