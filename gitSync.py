@@ -210,6 +210,10 @@ for project in projects:
     localDest = localRepo.create_remote(target, remoteDir)
     print('- Created new remote {} in local repo.'.format(target), flush=True)
 
+  # Fetch from remote (necessary for setting up local branches and pulling).
+  localDest.fetch()
+  print('- Fetched remote {} in local repo.'.format(target), flush=True)
+
   # Enable pushing directly to remote.
   with remoteRepo.config_writer() as cw:
     cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
@@ -224,17 +228,19 @@ for project in projects:
   for branchName in branchNames:
     # Setup local branch if necessary.
     if not branchName in localBranches:
-      remoteBranch = remoteBranches[branchName]
-      localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
+      remoteBranch = localDest.refs[branchName]
+      localBranch = localRepo.create_head(branchName, remoteBranch).set_tracking_branch(remoteBranch)
       branchPrint(branchName, 'Created in local.')
-    localBranch = localBranches[branchName]
+    else:
+      localBranch = localBranches[branchName]
 
     # Setup remote branch if necessary.
     if not branchName in remoteBranches:
       localBranch = localBranches[branchName]
-      remoteRepo.create_head(branchName, localBranch)
+      remoteBranch = remoteRepo.create_head(branchName, localBranch)
       branchPrint(branchName, 'Created in remote.')
-    remoteBranch = remoteBranches[branchName]
+    else:
+      remoteBranch = remoteBranches[branchName]
 
     # Sync the repos (push, pull, or neither).
     if localBranch.commit == remoteBranch.commit:
