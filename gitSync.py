@@ -237,7 +237,7 @@ for project in projects:
       if localBranch.commit == remoteBranch.commit:
         branchPrint(branchName, 'Up to date.')
       else:
-        mergeBase = localRepo.merge_base(localBranch, remoteBranch)[0]
+        mergeBase = localRepo.merge_base(localBranch.commit, remoteBranch.commit)[0]
         if mergeBase == localBranch.commit:
           stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
         elif mergeBase == remoteBranch.commit:
