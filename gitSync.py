@@ -214,6 +214,10 @@ for project in projects:
     localDest = localRepo.create_remote(target, remoteDir)
     print('- Created new remote {} in local repo.'.format(target), flush=True)
 
+  # Fetch the remote (necessary for merge-base).
+  print('- Fetching remote {}...'.format(target), flush=True)
+  localDest.fetch()
+
   # Enable pushing directly to remote.
   with remoteRepo.config_writer() as cw:
     cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
@@ -240,7 +244,7 @@ for project in projects:
       if localBranch.commit == remoteBranch.commit:
         branchPrint(branchName, 'Up to date.')
       else:
-        mergeBase = localRepo.merge_base(localBranch.commit, remoteBranch.commit)[0]
+        mergeBase = localRepo.merge_base(localBranch, localDest.refs[branchName])[0]
         if mergeBase == localBranch.commit:
           stashRun(partial(gitPull, localDest, branchName, dryrun), localRepo, branchName, 'local')
         elif mergeBase == remoteBranch.commit:
