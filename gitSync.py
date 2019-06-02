@@ -222,6 +222,21 @@ for project in projects:
   with remoteRepo.config_writer() as cw:
     cw.set_value('receive', 'denyCurrentBranch', 'updateInstead')
 
+  # Sync remotes between repos.
+  print('- Syncing remotes.', flush=True)
+  localRemotes = localRepo.remotes
+  remoteRemotes = remoteRepo.remotes
+  for r in localRemotes:
+    if not (r.name == target or r in remoteRemotes):
+      if not dryrun:
+        remoteRepo.create_remote(r.name, r.url)
+      print('\t{} created in remote.'.format(r.name), flush=True)
+  for r in remoteRemotes:
+    if not (r.name == target or r in localRemotes):
+      if not dryrun:
+        localRepo.create_remote(r.name, r.url)
+      print('\t{} created in local.'.format(r.name), flush=True)
+
   # Get full list of branches.
   localBranches = localRepo.branches
   remoteBranches = remoteRepo.branches
