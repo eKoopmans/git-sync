@@ -69,6 +69,10 @@ def stashRun(toRun, repo, branchName, location):
   # Run the function.
   toRun()
 
+  # Hard reset the head (sometimes necessary to update the active branch).
+  if not dryrun:
+    repo.head.reset('--hard')
+
   # Restore any stashed files (if the main branch was dirty).
   if isDirty:
     if not dryrun:
