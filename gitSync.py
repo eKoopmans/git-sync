@@ -179,11 +179,15 @@ for project in projects:
     remoteError = True
   else:
     try:
-      remoteDir = next(localRepo.remote(target).urls)
+      remoteDir = localRepo.remote(target).url
+    except:
+      print('- Remote {} is not defined.\n'.format(target), flush=True)
+      continue
+    try:
       remoteRepo = Repo(remoteDir)
       remoteError = False
     except:
-      print('- Remote target is not defined.\n', flush=True)
+      print('- Remote {} is inaccessible.\n'.format(target), flush=True)
       continue
 
   # Skip if neither is a git project.
