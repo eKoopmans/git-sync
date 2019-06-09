@@ -142,15 +142,15 @@ if not projects:
   if remote:
     projects = uniqMerge(projects, next(os.walk(remote))[1])
 
-# Fix if inside a git repo.
-if '.git' in projects:
-  projects = [local.split(os.sep)[-1]]
-  local = parentDir(local)
-
 # Fix local and remote to be absolute paths.
 local = os.path.abspath(local)
 if remote:
   remote = os.path.abspath(remote)
+
+# Fix if inside a git repo.
+if '.git' in projects:
+  projects = [local.split(os.sep)[-1]]
+  local = parentDir(local)
 
 # Loop through all dirs.
 for project in projects:
