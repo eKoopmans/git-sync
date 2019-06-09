@@ -179,7 +179,7 @@ for project in projects:
     remoteError = True
   else:
     try:
-      remoteDir = localRepo.remote(target).url
+      remoteDir = localRepo.remote(target).url.replace(r'\\', '\\')
     except:
       print('- Remote {} is not defined.\n'.format(target), flush=True)
       continue
@@ -217,7 +217,9 @@ for project in projects:
 
   # Setup local repo to point to remote.
   try:
-    localDest = localRepo.remote(target).set_url(remoteDir)
+    localDest = localRepo.remote(target)
+    if remote:
+      localDest.set_url(remoteDir)
   except:
     localDest = localRepo.create_remote(target, remoteDir)
     print('- Created new remote {} in local repo.'.format(target), flush=True)
