@@ -52,6 +52,9 @@ def parentDir(path):
   return os.path.abspath(os.path.join(path, os.pardir))
 def branchPrint(branchName, text):
   print('\t{:10}:\t{}'.format(branchName, text), flush=True)
+def branchError(branchName, text, e):
+  errMsg = '\t{:10} \t{}'.format('', str(e)).replace('\n', '\n\t\t\t')
+  print('\t{:10}:\t{}\n{}'.format(branchName, text, errMsg), flush=True)
 
 # Function to stash/unstash before modifying active branch.
 def stashRun(toRun, repo, branchName, location):
@@ -65,8 +68,8 @@ def stashRun(toRun, repo, branchName, location):
     if not dryrun:
       try:
         repo.git.stash(['save', '--include-untracked'])
-      except:
-        return branchPrint(branchName, 'Error stashing files at {}, skipping.'.format(location))
+      except Exception as e:
+        return branchError(branchName, 'Error stashing files at {}:'.format(location), e)
     branchPrint(branchName, 'Stashing files ({} dirty).'.format(location))
 
   # Run the function.
@@ -105,8 +108,8 @@ def gitPull(localDest, branchName, dryrun):
     else:
       localDest.fetch([refspec, '--update-head-ok'])
     branchPrint(branchName, 'Fetched from remote.')
-  except:
-    branchPrint(branchName, 'Error fetching.')
+  except Exception as e:
+    branchError(branchName, 'Error fetching:', e)
 
 # Push function.
 def gitPush(localDest, branchName, dryrun):
@@ -117,8 +120,8 @@ def gitPush(localDest, branchName, dryrun):
     else:
       localDest.push([branchName, '--tags'])
     branchPrint(branchName, 'Pushed to remote.')
-  except:
-    branchPrint(branchName, 'Error pushing.')
+  except Exception as e:
+    branchError(branchName, 'Error pushing:', e)
 
 # Setup variables.
 ffs = r"C:\Program Files\FreeFileSync\FreeFileSync.exe"
