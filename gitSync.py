@@ -63,7 +63,10 @@ def stashRun(toRun, repo, branchName, location):
   isDirty = repo.is_dirty(untracked_files=True)
   if isDirty:
     if not dryrun:
-      repo.git.stash(['save', '--include-untracked'])
+      try:
+        repo.git.stash(['save', '--include-untracked'])
+      except:
+        return branchPrint(branchName, 'Error stashing files at {}, skipping.'.format(location))
     branchPrint(branchName, 'Stashing files ({} dirty).'.format(location))
 
   # Run the function.
